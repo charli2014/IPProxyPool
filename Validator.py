@@ -22,17 +22,19 @@ def detect_from_db(myip, proxy, proxies_set):
     proxy_dict = {'ip': proxy[0], 'port': proxy[1]}
     result = detect_proxy(myip, proxy_dict)
     if result:
-	    if proxy[2] <= 15:
-            score = proxy[2]+1
-            sqlhelper.update({'ip': proxy[0], 'port': proxy[1]}, {'score': score})
+        score = proxy[2]+1
+        sqlhelper.update({'ip': proxy[0], 'port': proxy[1]}, {'score': score})
         proxy_str = '%s:%s' % (proxy[0], proxy[1])
         proxies_set.add(proxy_str)
 
     else:
-        if proxy[2] < 3:
+        if proxy[2] < 1:
             sqlhelper.delete({'ip': proxy[0], 'port': proxy[1]})
         else:
-            score = proxy[2]-3
+            if proxy[2] >= 11:
+                score = config.DEFAULT_SCORE
+            else:
+                score = proxy[2]-1
             sqlhelper.update({'ip': proxy[0], 'port': proxy[1]}, {'score': score})
             proxy_str = '%s:%s' % (proxy[0], proxy[1])
             proxies_set.add(proxy_str)
